@@ -175,6 +175,8 @@ void GuiGroup::draw() {
         gy += spaceH;
 	}
     
+    height = gy; // auto resize (toggle?)   
+    
     if(bDrawFPS) {
         ofSetColor(style.headerTextColor);
         if(GuiStyle::font.isLoaded()) {

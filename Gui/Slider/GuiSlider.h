@@ -11,6 +11,8 @@
 
 class GuiSlider : public GuiElement {
 
+private:
+            
 public:
 
 	GuiSlider();
@@ -30,6 +32,7 @@ public:
 	
 	float	min, max;
 	float	value;
+    float   smoothValue;
     
     bool    bIsInt;
 	float * valuePtrF;

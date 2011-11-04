@@ -10,15 +10,17 @@
 #include "GuiSlider.h"
 
 GuiSlider::GuiSlider() {
-    bIsInt     = false;
-	bDrawInfo  = true;
-	valuePtrF  = NULL;
-    valuePtrI  = NULL;
     
-	value      = 0.0;
-	min        = 0;
-	max        = 0;
-	offset     = defaultGuiStyle.sliderOffset;
+    bIsInt      = false;
+	bDrawInfo   = true;
+	valuePtrF   = NULL;
+    valuePtrI   = NULL;
+    
+    smoothValue = 0;
+	value       = 0.0;
+	min         = 0;
+	max         = 0;
+	offset      = defaultGuiStyle.sliderOffset;
 	
     setSize(defaultGuiStyle.sliderW, defaultGuiStyle.sliderH);
 }
@@ -108,7 +110,14 @@ void GuiSlider::mousePressed(int mx, int my) {
 
 //--------------------------------------------------------------
 void GuiSlider::mouseDragged(int mx, int my) {
-	if(bPressed) {
-		setValueNormal(ofMap(mx, x, width+x, 0.0, 1.0, true));
+	float msx = mx;
+    if(bPressed) {
+        if(ofGetKeyPressed(9)) {
+            smoothValue += ( ofMap(msx, x, width+x, 0.0, 1.0, true) - smoothValue ) * .02;
+        }
+        else         {
+            smoothValue = ofMap(msx, x, width+x, 0.0, 1.0, true);
+        }
+		setValueNormal(smoothValue);
 	}
 }
