@@ -26,6 +26,9 @@ static ofColor ofRandomColor() {
 static ofVec2f ofRandomVec2f(float min=-1, float max=1) {
 	return ofVec2f(ofRandom(min, max), ofRandom(min, max));
 }
+static ofVec3f ofRandomVec3f(float min=-1, float max=1) {
+	return ofVec3f(ofRandom(min, max), ofRandom(min, max), ofRandom(min, max));
+}
 
 static float ofDist(const ofVec2f &a, const ofVec2f &b) {
     return ofDist(a.x, a.y, b.x, b.y);
