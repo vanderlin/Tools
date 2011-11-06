@@ -59,6 +59,28 @@ static void ofDot(ofPoint &p) {
     ofDot(p.x, p.y, p.z);
 }
 
+static float fpsVals[100];
+static void drawFPS(float x, float y, float w=60, float h=20) {
+  
+    fpsVals[ofGetFrameNum()%100] = ofGetFrameRate();
+    string fps = "FPS "+ofToString(ofGetFrameRate(), 0);
+    ofFill();
+    ofSetColor(255, 100);
+    ofRect(x, y, w, h);
+    
+    ofSetColor(0);
+    ofDrawBitmapString(fps, x+8, y+(h/2)+4);
+    
+    ofSetColor(0, 100);
+    ofNoFill();
+    ofBeginShape();
+    for (int i=0; i<100; i++) {
+        float v = ofMap(60-fpsVals[i], 0.0, 60.0, 0.0, h, true);
+        ofVertex(x+ofMap(i, 0, 99, 0.0, w), y-v);
+    }
+    ofEndShape();
+}
+
 
 static void drawMouseCoords() {
     ofEnableAlphaBlending();
