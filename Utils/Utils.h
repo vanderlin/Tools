@@ -102,6 +102,9 @@ static void drawFloor(float w, float h) {
      d     c
      */
     
+    ofPushMatrix();
+    ofTranslate(0, 0, 0);
+    ofRotateX(90);
     ofVec3f a(-w/2, -h/2, 0);
     ofVec3f b(w/2, -h/2, 0);
     ofVec3f c(w/2, h/2, 0);
@@ -110,7 +113,8 @@ static void drawFloor(float w, float h) {
     glVertex3fv(&a[0]); glVertex3fv(&b[0]);
     glVertex3fv(&c[0]); glVertex3fv(&d[0]);
     glEnd();
-    
+    ofPopMatrix();
+
 }
 
 
