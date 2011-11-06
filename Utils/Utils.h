@@ -149,7 +149,7 @@ static void readDirectory(string path, vector<ofFile>&files, vector<string>allow
 	
     ofDirectory dir;
 	int nItems = dir.listDir(path);
-    int MAX_FILES = 1000;
+    int MAX_FILES = 5000;
     
 	if(nItems > 0) {
 		for (int i=0; i<nItems; i++) {
