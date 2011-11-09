@@ -20,6 +20,10 @@ static void ofSetHexColor(int hexColor, int alpha) {
 	ofSetColor(r,g,b, alpha);
 }
 
+static float ofXeno(float val, float target, float amt) {
+    return (amt * target) + ((1.0f - amt) * val);
+}
+
 // ----------------------------
 // Totally ripper from the Hodge!
 // ----------------------------
