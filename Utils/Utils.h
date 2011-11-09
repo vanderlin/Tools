@@ -20,6 +20,38 @@ static void ofSetHexColor(int hexColor, int alpha) {
 	ofSetColor(r,g,b, alpha);
 }
 
+// ----------------------------
+// Totally ripper from the Hodge!
+// ----------------------------
+// ------------------------------------------------
+static float getRads(float val1, float val2, float mult, float div) {
+	float minNoise = 0.499;
+	float maxNoise = 0.501;
+	float counter = 0;
+	
+    float rads = ofNoise(val1/div, val2/div, counter/div);
+    
+    if (rads < minNoise) minNoise = rads;
+    if (rads > maxNoise) maxNoise = rads;
+    
+    rads -= minNoise;
+    rads *= 1.0/(maxNoise - minNoise);
+    
+    return rads * mult;
+}
+// ----------------------------
+// ----------------------------
+
+//--------------------------------------------------------------
+static ofVec3f getNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) {
+	ofVec3f frc(
+				ofSignedNoise(a_loc.x * a_mult, a_loc.z * a_mult, a_off),
+				ofSignedNoise(a_loc.y * a_mult, a_loc.x * a_mult, a_off),
+				ofSignedNoise(a_loc.x * a_mult, a_loc.y * a_mult, a_off)
+				);
+	return frc;
+}
+
 static ofColor ofRandomColor() {
 	return ofColor(ofRandom(255), ofRandom(255), ofRandom(255));
 }
