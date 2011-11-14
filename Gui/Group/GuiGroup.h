@@ -95,6 +95,13 @@ public:
 			GuiGroup::groups[i]->save();
 		}
 	}
+    
+    //--------------------------------------------------------------
+	static void loadAllGroups() {
+		for(int i=0; i<GuiGroup::groups.size(); i++) {
+			GuiGroup::groups[i]->load();
+		}
+	}
 	
 	//--------------------------------------------------------------
 	static void hideAll() {
