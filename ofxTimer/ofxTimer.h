@@ -45,6 +45,7 @@ private:
 	
 public:
 	
+    int                         type;
 	int                         count;
 	ofEvent <ofxTimerEventArgs> events;
 	
@@ -53,7 +54,7 @@ public:
 	
 	// ---------------------------------------
 	void reset();
-	void setup(float millSeconds, bool loopTimer);
+	void setup(float millSeconds, bool loopTimer, int timerType=-1);
 	
 	// ---------------------------------------
 	void setTimer(float millSeconds);
