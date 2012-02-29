@@ -45,7 +45,7 @@ void ofxTimer::setup(float millSeconds, bool loopTimer, int timerType) {
 	
 	//events
 	if(!bUpdateSetup) {
-        ofAddListener(ofEvents.update, this, &ofxTimer::update);
+        ofAddListener(ofEvents().update, this, &ofxTimer::update);
         bUpdateSetup = true;
     }
 }
@@ -77,7 +77,7 @@ void ofxTimer::update(ofEventArgs &e) {
 		if(time >= delay) {
 			count ++;
 			if(!bLoop) {
-                ofRemoveListener(ofEvents.update, this, &ofxTimer::update);
+                ofRemoveListener(ofEvents().update, this, &ofxTimer::update);
                 bPauseTimer  = true;
                 bUpdateSetup = false;
             }
@@ -96,7 +96,7 @@ void ofxTimer::setTimer(float millSeconds) {
 
 void ofxTimer::start() {
     if(!bUpdateSetup) {
-        ofAddListener(ofEvents.update, this, &ofxTimer::update);
+        ofAddListener(ofEvents().update, this, &ofxTimer::update);
         bUpdateSetup = true;
     }
 	bPauseTimer = false;
@@ -105,7 +105,7 @@ void ofxTimer::start() {
 void ofxTimer::stop() {
 	bPauseTimer = true;
     if(!bLoop) {
-        ofRemoveListener(ofEvents.update, this, &ofxTimer::update);
+        ofRemoveListener(ofEvents().update, this, &ofxTimer::update);
         bUpdateSetup = false;
     }
 }
