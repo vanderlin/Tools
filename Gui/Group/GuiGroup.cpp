@@ -277,10 +277,10 @@ GuiLabel * GuiGroup::addLabel(string name, int * value) {
 
 //--------------------------------------------------------------
 void GuiGroup::registerEvents() {
-	ofAddListener(ofEvents.mouseMoved, this, &GuiGroup::mouseMoved);
-	ofAddListener(ofEvents.mouseDragged, this, &GuiGroup::mouseDragged);
-	ofAddListener(ofEvents.mousePressed, this, &GuiGroup::mousePressed);
-	ofAddListener(ofEvents.mouseReleased, this, &GuiGroup::mouseReleased);
+	ofAddListener(ofEvents().mouseMoved, this, &GuiGroup::mouseMoved);
+	ofAddListener(ofEvents().mouseDragged, this, &GuiGroup::mouseDragged);
+	ofAddListener(ofEvents().mousePressed, this, &GuiGroup::mousePressed);
+	ofAddListener(ofEvents().mouseReleased, this, &GuiGroup::mouseReleased);
 }
 
 //--------------------------------------------------------------
