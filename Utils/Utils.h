@@ -9,6 +9,9 @@
 
 #pragma once
 #include "ofMain.h"
+static float inToPx(float v) {
+    return v * 72.0; 
+}
 
 static void ofVertex(const ofVec2f &v) {
 	ofVertex(v.x, v.y);
@@ -163,13 +166,13 @@ static void drawFloor(float w, float h) {
     ofPushMatrix();
     ofTranslate(0, 0, 0);
     ofRotateX(90);
-    ofVec3f a(-w/2, -h/2, 0);
-    ofVec3f b(w/2, -h/2, 0);
-    ofVec3f c(w/2, h/2, 0);
-    ofVec3f d(-w/2, h/2, 0);
+    ofVec3f pa(-w/2, -h/2, 0);
+    ofVec3f pb(w/2, -h/2, 0);
+    ofVec3f pc(w/2, h/2, 0);
+    ofVec3f pd(-w/2, h/2, 0);
     glBegin(GL_QUADS);
-    glVertex3fv(&a[0]); glVertex3fv(&b[0]);
-    glVertex3fv(&c[0]); glVertex3fv(&d[0]);
+    glVertex3fv(&pa[0]); glVertex3fv(&pb[0]);
+    glVertex3fv(&pc[0]); glVertex3fv(&pd[0]);
     glEnd();
     ofPopMatrix();
 

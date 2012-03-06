@@ -97,6 +97,13 @@ public:
 	}
     
     //--------------------------------------------------------------
+	static void drawAllGroups() {
+		for(int i=0; i<GuiGroup::groups.size(); i++) {
+			GuiGroup::groups[i]->draw();
+		}
+	}
+    
+    //--------------------------------------------------------------
 	static void loadAllGroups() {
 		for(int i=0; i<GuiGroup::groups.size(); i++) {
 			GuiGroup::groups[i]->load();
