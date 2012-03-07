@@ -73,6 +73,14 @@ static float ofDist(const ofVec2f &a, const ofVec2f &b) {
     return ofDist(a.x, a.y, b.x, b.y);
 }
 
+static float isPointInScreen(const ofVec2f &pt, float padding=0) {
+    ofRectangle screen(-padding, -padding, ofGetWidth()+(padding*2), ofGetHeight()+(padding*2)); 
+    return screen.inside(pt);
+}
+static float isPointInScreen(float x, float y, float padding=0) {
+    return isPointInScreen(x, y);
+}
+
 static void drawDot(float x, float y, float r=3) {
 	ofFill();
 	ofCircle(x, y, 1);
