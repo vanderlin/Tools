@@ -9,6 +9,7 @@
 
 #pragma once
 #include "ofMain.h"
+
 static float inToPx(float v) {
     return v * 72.0; 
 }
