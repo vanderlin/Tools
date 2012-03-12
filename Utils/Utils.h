@@ -60,6 +60,9 @@ static ofVec3f getNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) 
 	return frc;
 }
 
+//--------------------------------------------------------------
+// Random
+//--------------------------------------------------------------
 static ofColor ofRandomColor() {
 	return ofColor(ofRandom(255), ofRandom(255), ofRandom(255));
 }
@@ -70,6 +73,9 @@ static ofVec3f ofRandomVec3f(float min=-1, float max=1) {
 	return ofVec3f(ofRandom(min, max), ofRandom(min, max), ofRandom(min, max));
 }
 
+//--------------------------------------------------------------
+// Point / Rect Utils
+//--------------------------------------------------------------
 static float ofDist(const ofVec2f &a, const ofVec2f &b) {
     return ofDist(a.x, a.y, b.x, b.y);
 }
@@ -82,6 +88,19 @@ static float isPointInScreen(float x, float y, float padding=0) {
     return isPointInScreen(x, y);
 }
 
+//--------------------------------------------------------------
+// Utils
+//--------------------------------------------------------------
+template<class T>
+static int ofRandomIndex(vector<T>&items) {
+    if(items.size()==0) return -1;
+    return (int)ofRandom(0, (int)(items.size()-1));
+}
+
+
+//--------------------------------------------------------------
+// Drawing
+//--------------------------------------------------------------
 static void drawDot(float x, float y, float r=3) {
 	ofFill();
 	ofCircle(x, y, 1);
@@ -142,24 +161,6 @@ static void drawMouseCoords() {
     ofPopMatrix();
 }
 
-static ofVec2f ofGetMouse() {
-    return ofVec2f(ofGetMouseX(), ofGetMouseY());
-}
-static ofVec2f ofGetMouseNormal() {
-    return ofVec2f(ofMap(ofGetMouseX(), 0.0, ofGetWidth(), 0.0, 1.0, true), ofMap(ofGetMouseY(), 0.0, ofGetHeight(), 0.0, 1.0, true));
-}
-
-static ofVec2f ofGetCenterScreen() {
-    return ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
-}
-
-static string ofTruncate(string &str, int max, bool addDotDotDot=true) {
-    if(str.length() >= max) {
-        str = str.substr(0, max);
-        if(addDotDotDot) str += "...";
-    }
-    return str;
-}
 
 
 static void drawFloor(float w, float h) {
@@ -184,7 +185,7 @@ static void drawFloor(float w, float h) {
     glVertex3fv(&pc[0]); glVertex3fv(&pd[0]);
     glEnd();
     ofPopMatrix();
-
+    
 }
 
 
@@ -212,6 +213,32 @@ static void drawGrid(float w, float h, int numCols=10, int numRows=10) {
     ofPopMatrix();
     
     
+}
+
+
+//--------------------------------------------------------------
+// Mouse / Screen
+//--------------------------------------------------------------
+static ofVec2f ofGetMouse() {
+    return ofVec2f(ofGetMouseX(), ofGetMouseY());
+}
+static ofVec2f ofGetMouseNormal() {
+    return ofVec2f(ofMap(ofGetMouseX(), 0.0, ofGetWidth(), 0.0, 1.0, true), ofMap(ofGetMouseY(), 0.0, ofGetHeight(), 0.0, 1.0, true));
+}
+
+static ofVec2f ofGetCenterScreen() {
+    return ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
+}
+
+//--------------------------------------------------------------
+// String
+//--------------------------------------------------------------
+static string ofTruncate(string &str, int max, bool addDotDotDot=true) {
+    if(str.length() >= max) {
+        str = str.substr(0, max);
+        if(addDotDotDot) str += "...";
+    }
+    return str;
 }
 
 //-------------------------------------------------------------- (this may be making a bug)!!!
