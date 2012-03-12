@@ -59,9 +59,16 @@ static ofVec3f getNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) 
 	return frc;
 }
 
+// ------------------------------------------------
+// Random Colors
+// ------------------------------------------------
 static ofColor ofRandomColor() {
 	return ofColor(ofRandom(255), ofRandom(255), ofRandom(255));
 }
+
+// ------------------------------------------------
+// Random Vectors
+// ------------------------------------------------
 static ofVec2f ofRandomVec2f(float min=-1, float max=1) {
 	return ofVec2f(ofRandom(min, max), ofRandom(min, max));
 }
@@ -69,10 +76,14 @@ static ofVec3f ofRandomVec3f(float min=-1, float max=1) {
 	return ofVec3f(ofRandom(min, max), ofRandom(min, max), ofRandom(min, max));
 }
 
+// ------------------------------------------------
+// Helpers
+// ------------------------------------------------
 static float ofDist(const ofVec2f &a, const ofVec2f &b) {
     return ofDist(a.x, a.y, b.x, b.y);
 }
 
+// ------------------------------------------------
 static float isPointInScreen(const ofVec2f &pt, float padding=0) {
     ofRectangle screen(-padding, -padding, ofGetWidth()+(padding*2), ofGetHeight()+(padding*2)); 
     return screen.inside(pt);
@@ -81,6 +92,19 @@ static float isPointInScreen(float x, float y, float padding=0) {
     return isPointInScreen(x, y);
 }
 
+static ofVec2f ofRandomPointInRect(float x, float y, float w, float h, float padding=0) {
+    float rx = ofRandom(x+padding, x+(w-padding*2));
+    float ry = ofRandom(y+padding, y+(h-padding*2));
+    return ofVec2f(rx, ry);
+}
+static ofVec2f ofRandomPointInRect(const ofRectangle &r, float padding=0) {
+    return ofRandomPointInRect(r.x, r.y, r.width, r.height, padding);
+}
+
+
+// ------------------------------------------------
+// Drawing 
+// ------------------------------------------------
 static void drawDot(float x, float y, float r=3) {
 	ofFill();
 	ofCircle(x, y, 1);

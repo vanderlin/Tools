@@ -12,6 +12,32 @@
 
 namespace GeometryUtils {
     
+    //-------------------------------------------------------------------  
+    static ofVec2f getLineIntersection(const ofVec2f &pt1, const ofVec2f &pt2, const ofVec2f &pt3, const ofVec2f &pt4, bool doInfinite=true) {
+        float bx = pt2.x - pt1.x;
+        float by = pt2.y - pt1.y;
+        float dx = pt4.x - pt3.x;
+        float dy = pt4.y - pt3.y; 
+        float b_dot_d_perp = bx * dy - by * dx;
+        if(b_dot_d_perp == 0) {
+            return ofVec2f(0,0);
+        }
+        float cx = pt3.x-pt1.x; 
+        float cy = pt3.y-pt1.y;
+        float t = (cx*dy - cy*dx) / b_dot_d_perp; 
+        if(!doInfinite) {
+            if(t < 0 || t > 1) {
+                return ofVec2f(0,0);
+            }
+            float u = (cx * by - cy * bx) / b_dot_d_perp;
+            if(u < 0 || u > 1) { 
+                return ofVec2f(0,0);
+            }
+        }
+        return ofVec2f(pt1.x+t*bx, pt1.y+t*by); 
+
+    }
+    
     //-------------------------------------------------------------------
     static float getTriangleRadius(ofVec2f v1, ofVec2f v2, ofVec2f v3) {
         
