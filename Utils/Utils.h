@@ -49,11 +49,9 @@ static float getRads(float val1, float val2, float mult, float div) {
 
 //--------------------------------------------------------------
 static ofVec3f getNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) {
-	ofVec3f frc(
-				ofSignedNoise(a_loc.x * a_mult, a_loc.z * a_mult, a_off),
+	ofVec3f frc(ofSignedNoise(a_loc.x * a_mult, a_loc.z * a_mult, a_off),
 				ofSignedNoise(a_loc.y * a_mult, a_loc.x * a_mult, a_off),
-				ofSignedNoise(a_loc.x * a_mult, a_loc.y * a_mult, a_off)
-				);
+				ofSignedNoise(a_loc.x * a_mult, a_loc.y * a_mult, a_off));
 	return frc;
 }
 
@@ -86,7 +84,6 @@ static float isPointInScreen(float x, float y, float padding=0) {
     return isPointInScreen(x, y);
 }
 
-<<<<<<< HEAD
 static ofVec2f ofRandomPointInRect(float x, float y, float w, float h, float padding=0) {
     float rx = ofRandom(x+padding, x+(w-padding*2));
     float ry = ofRandom(y+padding, y+(h-padding*2));
