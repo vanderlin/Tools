@@ -9,6 +9,7 @@
 
 #pragma once
 #include "ofMain.h"
+
 static float inToPx(float v) {
     return v * 72.0; 
 }
@@ -27,9 +28,8 @@ static float ofXeno(float val, float target, float amt) {
     return (amt * target) + ((1.0f - amt) * val);
 }
 
-// ----------------------------
+// ------------------------------------------------
 // Totally ripper from the Hodge!
-// ----------------------------
 // ------------------------------------------------
 static float getRads(float val1, float val2, float mult, float div) {
 	float minNoise = 0.499;
@@ -46,8 +46,6 @@ static float getRads(float val1, float val2, float mult, float div) {
     
     return rads * mult;
 }
-// ----------------------------
-// ----------------------------
 
 //--------------------------------------------------------------
 static ofVec3f getNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) {
@@ -59,16 +57,12 @@ static ofVec3f getNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) 
 	return frc;
 }
 
-// ------------------------------------------------
-// Random Colors
-// ------------------------------------------------
+//--------------------------------------------------------------
+// Random
+//--------------------------------------------------------------
 static ofColor ofRandomColor() {
 	return ofColor(ofRandom(255), ofRandom(255), ofRandom(255));
 }
-
-// ------------------------------------------------
-// Random Vectors
-// ------------------------------------------------
 static ofVec2f ofRandomVec2f(float min=-1, float max=1) {
 	return ofVec2f(ofRandom(min, max), ofRandom(min, max));
 }
@@ -92,6 +86,7 @@ static float isPointInScreen(float x, float y, float padding=0) {
     return isPointInScreen(x, y);
 }
 
+<<<<<<< HEAD
 static ofVec2f ofRandomPointInRect(float x, float y, float w, float h, float padding=0) {
     float rx = ofRandom(x+padding, x+(w-padding*2));
     float ry = ofRandom(y+padding, y+(h-padding*2));
@@ -102,16 +97,28 @@ static ofVec2f ofRandomPointInRect(const ofRectangle &r, float padding=0) {
 }
 
 
-// ------------------------------------------------
-// Drawing 
-// ------------------------------------------------
+//--------------------------------------------------------------
+// Utils
+//--------------------------------------------------------------
+template<class T>
+static int ofRandomIndex(vector<T>&items) {
+    if(items.size()==0) return -1;
+    return (int)ofRandom(0, (int)(items.size()-1));
+}
+
+
+//--------------------------------------------------------------
+// Drawing
+//--------------------------------------------------------------
 static void drawDot(float x, float y, float r=3) {
 	ofFill();
 	ofCircle(x, y, 1);
 	ofNoFill();
 	ofCircle(x, y, r);
 }
+
 static void drawDot(const ofVec2f &p, float r=3) { drawDot(p.x, p.y, r); }
+
 static void printObject(const vector <string> &obj) {
     for (int i=0; i<obj.size(); i++) {
         printf("%s\n", obj[i].c_str());
@@ -126,14 +133,13 @@ static void ofDot(float x, float y, float z=0) {
     glDrawArrays(GL_POINTS, 0, 1);
     glDisableClientState(GL_VERTEX_ARRAY);
 }
+
 static void ofDot(ofPoint &p) {
     ofDot(p.x, p.y, p.z);
 }
 
-static float fpsVals[100];
 static void drawFPS(float x, float y, float w=60, float h=20) {
   
-    fpsVals[ofGetFrameNum()%100] = ofGetFrameRate();
     string fps = "FPS "+ofToString(ofGetFrameRate(), 0);
     ofFill();
     ofSetColor(255, 100);
@@ -141,17 +147,7 @@ static void drawFPS(float x, float y, float w=60, float h=20) {
     
     ofSetColor(0);
     ofDrawBitmapString(fps, x+8, y+(h/2)+4);
-    
-    ofSetColor(0, 100);
-    ofNoFill();
-    ofBeginShape();
-    for (int i=0; i<100; i++) {
-        float v = ofMap(60-fpsVals[i], 0.0, 60.0, 0.0, h, true);
-        ofVertex(x+ofMap(i, 0, 99, 0.0, w), y-v);
-    }
-    ofEndShape();
 }
-
 
 static void drawMouseCoords() {
     ofEnableAlphaBlending();
@@ -164,26 +160,6 @@ static void drawMouseCoords() {
     ofDrawBitmapString(ofToString(ofGetMouseX())+","+ofToString(ofGetMouseY()), 10, 10);
     ofPopMatrix();
 }
-
-static ofVec2f ofGetMouse() {
-    return ofVec2f(ofGetMouseX(), ofGetMouseY());
-}
-static ofVec2f ofGetMouseNormal() {
-    return ofVec2f(ofMap(ofGetMouseX(), 0.0, ofGetWidth(), 0.0, 1.0, true), ofMap(ofGetMouseY(), 0.0, ofGetHeight(), 0.0, 1.0, true));
-}
-
-static ofVec2f ofGetCenterScreen() {
-    return ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
-}
-
-static string ofTruncate(string &str, int max, bool addDotDotDot=true) {
-    if(str.length() >= max) {
-        str = str.substr(0, max);
-        if(addDotDotDot) str += "...";
-    }
-    return str;
-}
-
 
 static void drawFloor(float w, float h) {
     
@@ -207,9 +183,8 @@ static void drawFloor(float w, float h) {
     glVertex3fv(&pc[0]); glVertex3fv(&pd[0]);
     glEnd();
     ofPopMatrix();
-
+    
 }
-
 
 static void drawGrid(float w, float h, int numCols=10, int numRows=10) {
     
@@ -235,6 +210,32 @@ static void drawGrid(float w, float h, int numCols=10, int numRows=10) {
     ofPopMatrix();
     
     
+}
+
+
+//--------------------------------------------------------------
+// Mouse / Screen
+//--------------------------------------------------------------
+static ofVec2f ofGetMouse() {
+    return ofVec2f(ofGetMouseX(), ofGetMouseY());
+}
+static ofVec2f ofGetMouseNormal() {
+    return ofVec2f(ofMap(ofGetMouseX(), 0.0, ofGetWidth(), 0.0, 1.0, true), ofMap(ofGetMouseY(), 0.0, ofGetHeight(), 0.0, 1.0, true));
+}
+
+static ofVec2f ofGetCenterScreen() {
+    return ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
+}
+
+//--------------------------------------------------------------
+// String
+//--------------------------------------------------------------
+static string ofTruncate(string &str, int max, bool addDotDotDot=true) {
+    if(str.length() >= max) {
+        str = str.substr(0, max);
+        if(addDotDotDot) str += "...";
+    }
+    return str;
 }
 
 //-------------------------------------------------------------- (this may be making a bug)!!!
