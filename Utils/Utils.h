@@ -93,6 +93,16 @@ static ofVec2f ofRandomPointInRect(const ofRectangle &r, float padding=0) {
     return ofRandomPointInRect(r.x, r.y, r.width, r.height, padding);
 }
 
+static ofVec2f ofRandomPointInCircle(float x, float y, float radius, float padding=0) {
+    float r = ofRandom(radius);
+    float n = ofRandomuf();
+    r-= padding;
+    return ofVec2f(x + (cos(n*TWO_PI) * r), y + (sin(n*TWO_PI) * r));
+}
+static ofVec2f ofRandomPointInCircle(const ofVec2f &pt, float radius, float padding=0) {
+    return ofRandomPointInRect(pt.x, pt.y, radius, padding);
+}
+
 
 //--------------------------------------------------------------
 // Utils
