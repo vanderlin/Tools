@@ -111,7 +111,7 @@ static ofVec2f ofRandomPointInCircle(const ofVec2f &pt, float radius, float padd
 template<class T>
 static int ofRandomIndex(vector<T>&items) {
     if(items.size()==0) return -1;
-    return (int)ofRandom(0, (int)(items.size()-1));
+    return (int)ofRandom(0, (int)(items.size()));
 }
 
 
