@@ -80,9 +80,10 @@ static float isPointInScreen(const ofVec2f &pt, float padding=0) {
     ofRectangle screen(-padding, -padding, ofGetWidth()+(padding*2), ofGetHeight()+(padding*2)); 
     return screen.inside(pt);
 }
+/*
 static float isPointInScreen(float x, float y, float padding=0) {
     return isPointInScreen(x, y);
-}
+}*/
 
 static ofVec2f ofRandomPointInRect(float x, float y, float w, float h, float padding=0) {
     float rx = ofRandom(x+padding, x+(w-padding*2));
