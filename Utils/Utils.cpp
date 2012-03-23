@@ -189,7 +189,7 @@ vector <ofVec2f> Utils::loadPoints(string file) {
 	
 	return pts;
 }
-
+/*
 //--------------------------------------------------------------
 void Utils::savePolyPoints(vector <ofPolyline> &pts, string file) {
 	ofstream f;
@@ -235,7 +235,7 @@ vector <ofPolyline> Utils::loadPolyPoints(string file) {
 	}
 	
 	return pts;
-}
+}*/
 
 //--------------------------------------------------------------
 void Utils::saveData(string file, string data) {

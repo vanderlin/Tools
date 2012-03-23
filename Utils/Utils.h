@@ -127,6 +127,41 @@ static int ofRandomIndex(vector<T>&items) {
     return (int)ofRandom(0, (int)(items.size()));
 }
 
+// save out poly points
+static bool ofSavePolyPoints(ofPolyline &poly, string filename) {
+    if(poly.size() == 0) return false;
+    
+    ofstream f;
+	f.open(ofToDataPath(filename).c_str());
+	for (int i=0; i<poly.size(); i++) {
+		f << poly[i].x << "," << poly[i].y << "\n";
+	}
+	f.close();
+    
+    return true;
+}
+
+// load the poly points
+static bool ofLoadPolyPoints(ofPolyline &poly, string filename) {
+   	
+    ifstream f;
+	f.open(ofToDataPath(filename).c_str());
+	if(f!=0) {
+		while (!f.eof()) {
+            string ptsStr;
+			getline(f, ptsStr);
+        
+            vector <string> p = ofSplitString(ptsStr, ",");
+            if(p.size() >= 2) {
+                poly.addVertex(ofToFloat(p[0]), ofToFloat(p[1]));
+            }
+                
+        }
+		f.close();
+	}
+
+    return true;
+}
 
 //--------------------------------------------------------------
 // Drawing
@@ -327,9 +362,6 @@ public:
 	//--------------------------------------------------------------
 	static void savePoints(vector <ofVec2f> &pts, string file);
 	static vector <ofVec2f> loadPoints(string file);
-	
-	static void savePolyPoints(vector <ofPolyline> &pts, string file);
-	static vector <ofPolyline> loadPolyPoints(string file);
 	
 	static void drawRect3d(float x, float y, float w, float h, float d) {
 		ofPushMatrix();
