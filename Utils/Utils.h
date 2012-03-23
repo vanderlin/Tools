@@ -103,14 +103,27 @@ static ofVec2f ofRandomPointInCircle(const ofVec2f &pt, float radius, float padd
     return ofRandomPointInRect(pt.x, pt.y, radius, padding);
 }
 
+static ofVec3f ofRandomPointInSphere(float radius, float padding=0) {
+    float theta1 = ofRandom(0, TWO_PI);
+    float theta2 = ofRandom(0, TWO_PI);
+    
+    ofVec3f p;
+    p.x = cos( theta1 ) * cos( theta2 );
+    p.y = sin( theta1 );
+    p.z = cos( theta1 ) * sin( theta2 );
+    p *= (radius-padding);
+    return p;
+}
+
+
 
 //--------------------------------------------------------------
 // Utils
 //--------------------------------------------------------------
 template<class T>
 static int ofRandomIndex(vector<T>&items) {
-    if(items.size()==0) return -1;
-    return (int)ofRandom(0, (int)(items.size()-1));
+    if(items.size()==0) return 0;
+    return (int)ofRandom(0, (int)(items.size()));
 }
 
 
