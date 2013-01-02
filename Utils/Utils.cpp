@@ -137,12 +137,14 @@ void Utils::pushMask(ofRectangle &r) {
 	Utils::pushMask(r.x, r.y, r.width, r.height);
 }
 void Utils::pushMask(float x, float y, float width, float height) {
+    ofPushMatrix();
 	glEnable(GL_SCISSOR_TEST);
 	glScissor(x, (ofGetHeight()-(y+height)), width, height);
 }
 
 void Utils::popMask() {
 	glDisable(GL_SCISSOR_TEST);
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------

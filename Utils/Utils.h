@@ -397,6 +397,55 @@ public:
     
     }
     
+    //--------------------------------------------------------------
+    static vector<ofVec2f>getArc(float cx, float cy, float radius, float startAngle, float arcAngle, int numSegments=10) {
+        
+        float theta             = ofDegToRad(arcAngle) / float(numSegments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
+        float tangetial_factor  = tanf(theta);
+        float radial_factor     = cosf(theta);
+        
+        float x = radius * cosf(ofDegToRad(startAngle));    //we now start at the start angle
+        float y = radius * sinf(ofDegToRad(startAngle));
+        
+        vector<ofVec2f>outPts;
+        for(int i=0; i<numSegments; i++) {
+            outPts.push_back(ofVec2f(x + cx, y + cy));
+            
+            float tx = -y;
+            float ty = x;
+            
+            x += tx * tangetial_factor;
+            y += ty * tangetial_factor;
+            
+            x *= radial_factor;
+            y *= radial_factor;
+        }
+        return outPts;
+    }
+    
+    //--------------------------------------------------------------
+    static void drawArc(float cx, float cy, float innerArc, float outerArc, float startAngle, float arcAngle, int numSegments, ofColor startColor, ofColor endColor) {
+        
+        vector<ofVec2f> inner = Utils::getArc(cx, cy, innerArc, startAngle, arcAngle, numSegments);
+        vector<ofVec2f> outer = Utils::getArc(cx, cy, outerArc, startAngle, arcAngle, numSegments);
+        
+        glBegin(ofGetFill()==OF_FILLED?GL_QUAD_STRIP:GL_LINE_STRIP);
+        glColor4f(1.0, 0.0, 0.0, 1.0);
+        for (int i=0; i<numSegments; i++) {
+            glColor4f(startColor.r/255.0, startColor.g/255.0, startColor.b/255.0, startColor.a/255.0);
+            glVertex2f(inner[i].x, inner[i].y);
+            
+            glColor4f(endColor.r/255.0, endColor.g/255.0, endColor.b/255.0, endColor.a/255.0);
+            glVertex2f(outer[i].x, outer[i].y);
+            
+        }
+        glEnd();
+        
+    }
+    static void drawArc(ofPoint pt, float innerArc, float outerArc, float startAngle, float arcAngle, int numSegments, ofColor startColor, ofColor endColor) {
+        Utils::drawArc(pt.x, pt.y, innerArc, outerArc, startAngle, arcAngle, numSegments, startColor, endColor);
+    }
+    
     
 };
 
