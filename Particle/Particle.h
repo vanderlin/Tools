@@ -21,7 +21,7 @@ public:
     };
     
     vector<ofFloatColor> colors;
-    vector<ofVec2f>pts;
+    vector<ofVec2f>      pts;
     ofVbo vbo;
     ofColor     color;
     bool        bTaken, useHistory;
@@ -34,6 +34,7 @@ public:
     float       radius, drawRadius;
     float       drag;
     float       age, birthdate;
+    int         frameAge;
     float       uniquef;
     int         uniquei;
     int     type;
@@ -53,7 +54,7 @@ public:
     
     void update();
     void draw();
-    void drawHistory();
+    void drawHistory(int renderMode=GL_LINE_STRIP);
     
     void setPosition(float x, float y);
     void setPosition(const ofVec2f &p);
@@ -64,7 +65,7 @@ public:
     
     void resetForce();
     void attractionPoint(ofVec2f pt, float scl=1);
-    
+    void addNoiseForce(float scale=1.0);
     void avoidPoint(ofVec2f pt, float minRad, float scl=1);
     void avoidMouse(float minRad, float scl=1);
 };

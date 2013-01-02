@@ -48,7 +48,7 @@ static float getRads(float val1, float val2, float mult, float div) {
 }
 
 //--------------------------------------------------------------
-static ofVec3f getNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) {
+static ofVec3f ofGetNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off ) {
 	ofVec3f frc(ofSignedNoise(a_loc.x * a_mult, a_loc.z * a_mult, a_off),
 				ofSignedNoise(a_loc.y * a_mult, a_loc.x * a_mult, a_off),
 				ofSignedNoise(a_loc.x * a_mult, a_loc.y * a_mult, a_off));
@@ -116,7 +116,9 @@ static ofVec3f ofRandomPointInSphere(float radius, float padding=0) {
     return p;
 }
 
-
+static ofVec2f ofGetMouseVel() {
+    return ofVec2f(ofGetMouseX()-ofGetPreviousMouseX(),ofGetMouseY()-ofGetPreviousMouseY());
+}
 
 //--------------------------------------------------------------
 // Utils
@@ -125,6 +127,11 @@ template<class T>
 static int ofRandomIndex(vector<T>&items) {
     if(items.size()==0) return 0;
     return (int)ofRandom(0, (int)(items.size()));
+}
+template<class T>
+static T& ofRandomItem(vector<T>&items) {
+    if(items.size()==0) return;
+    return items[(int)ofRandom((int)(items.size()-1))];
 }
 
 // save out poly points
@@ -163,6 +170,23 @@ static bool ofLoadPolyPoints(ofPolyline &poly, string filename) {
     return true;
 }
 
+static string ofGetUniqueString(string pre="", string post="") {
+    string u = ofToString((int)ofGetUnixTime());
+    if(pre!="" && post !="") return pre + u + post;
+    else if(pre=="" && post !="") return u + post;
+    else if(post=="" && pre != "") return pre + u;
+    else return u;
+}
+
+static bool ofProbably(int chance=10) {
+    return (int)ofRandom(chance)==0;
+}
+
+static ofPolyline ofPolylineFromVec2f(const vector<ofVec2f>&p) {
+    ofPolyline poly;
+    for(int i=0; i<p.size(); i++) poly.addVertex(p[i]);
+    return poly;
+}
 //--------------------------------------------------------------
 // Drawing
 //--------------------------------------------------------------
@@ -190,9 +214,10 @@ static void ofDot(float x, float y, float z=0) {
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-static void ofDot(ofPoint &p) {
+static void ofDot(const ofPoint &p) {
     ofDot(p.x, p.y, p.z);
 }
+
 
 static void drawFPS(float x, float y, float w=60, float h=20) {
   
@@ -268,6 +293,33 @@ static void drawGrid(float w, float h, int numCols=10, int numRows=10) {
     
 }
 
+static void ofDrawBorderRect(float x, float y, float w, float h, const ofColor &fillColor=ofColor::gray, const ofColor &strokeColor=ofColor::white) {
+    
+    ofFill();
+    ofSetColor(fillColor, fillColor.a);
+    ofRect(x, y, w, h);
+    
+    ofNoFill();
+    ofSetColor(strokeColor, strokeColor.a);
+    ofRect(x, y, w, h);
+    
+}
+static void ofDrawBorderRect(const ofPoint &p, float w, float h, const ofColor &fillColor=ofColor::gray, const ofColor &strokeColor=ofColor::white) {
+    ofDrawBorderRect(p.x, p.y, w, h, fillColor, strokeColor);
+}
+static void ofDrawBorderRect(const ofRectangle &rec, const ofColor &fillColor=ofColor::gray, const ofColor &strokeColor=ofColor::white) {
+    ofDrawBorderRect(rec.x, rec.y, rec.width, rec.height, fillColor, strokeColor);
+}
+
+static void ofDrawBitmapStringCentered(const string &s, float x, float y, float widthToCenter, float heightToCenter=0) {
+    const static int  bitmapPixelW = 8;
+    const static int  bitmapPixelH = 9;
+    int   n  = s.size();
+    float sw = n * bitmapPixelW;
+    float sh = bitmapPixelH;
+    if(n==1)sw -= 2;
+    ofDrawBitmapString(s, x+(widthToCenter-sw)/2, (y+(heightToCenter-sh)/2) + sh);
+}
 
 //--------------------------------------------------------------
 // Mouse / Screen

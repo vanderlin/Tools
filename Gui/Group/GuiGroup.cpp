@@ -115,7 +115,7 @@ void GuiGroup::load() {
                         }
                     }
 				}
-				 printf("t:%i\nn:%s\nv:%f\n", type, name.c_str(), value);
+                //printf("t:%i\nn:%s\nv:%f\n", type, name.c_str(), value);
 			}
 		}
 		
@@ -217,7 +217,7 @@ GuiSlider * GuiGroup::addSlider(string name, int*valuePtr, float min, float max,
     e->bIsInt     = true;
 	e->setMinMax(min, max);
 	e->setValue(MAX(initVal, min));
-	
+	e->offset.x = 130;
 	//printf("init val: %f\n", e->getValue());
 	//printf("init val nf: %f\n", e->getValuef());
 	
