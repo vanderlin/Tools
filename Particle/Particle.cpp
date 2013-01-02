@@ -13,21 +13,22 @@ Particle::Particle() {
     letter = NULL;
     bFall = false;
     loverID = -1;
-    alpha   = 0;
+    alpha   = 1;
     
-    drag =  ofRandom(0.95, 0.96);
-    radius = 50;
-    fadeSpeed = ofRandom(0.02, 0.006);
-    drawRadius = 3;
-    maxSpeed = ofRandom(3.0, 8.0);
-    useHistory = false;
-    bFallTimer = false;
-    fallTimer = 0;
+    drag        = ofRandom(0.95, 0.96);
+    radius      = 10;
+    fadeSpeed   = ofRandom(0.02, 0.006);
+    drawRadius  = 3;
+    maxSpeed    = ofRandom(3.0, 8.0);
+    useHistory  = false;
+    bFallTimer  = false;
+    fallTimer   = 0;
     
     fadeInSpeed = 0.1;//ofRandom(0.01, 0.03);
     
-    birthdate = ofGetElapsedTimef();
-    age = 0;
+    birthdate   = ofGetElapsedTimef();
+    age         = 0;
+    frameAge    = 0;
 }
 
 /*
@@ -57,29 +58,30 @@ void Particle::update() {
     pos += vel;
     
     age = ofGetElapsedTimef() - birthdate;
+    frameAge++;
 }
 
 //--------------------------------------------------------------
 void Particle::draw() {
     ofEnableAlphaBlending();
     ofFill();
-    ofSetColor(0, alpha*255.0);
+    ofSetColor(color, alpha*255.0);
     ofCircle(pos, drawRadius);
 }
 
 //--------------------------------------------------------------
-void Particle::drawHistory() {
+void Particle::drawHistory(int renderMode) {
     ofEnableAlphaBlending();
-    if(useHistory) {
+    if(useHistory && pts.size()>2) {
         ofNoFill();
         colors.clear();
-        for (int i=0; i<pts.size(); i++) {
-            float pct = ofMap(i, 0, pts.size()-1, 0, 0.8) * alpha;
-            colors.push_back(ofFloatColor(1,1,1,pct));
-        }
-        vbo.setColorData(&colors[0], colors.size(), GL_DYNAMIC_DRAW);
+        //for (int i=0; i<pts.size(); i++) {
+            //float pct = ofMap(i, 0, pts.size()-1, 0, 0.8) * alpha;
+            //colors.push_back(ofFloatColor(1,1,1,pct));
+        //}
+        //vbo.setColorData(&colors[0], colors.size(), GL_DYNAMIC_DRAW);
         vbo.setVertexData(&pts[0], pts.size(), GL_DYNAMIC_DRAW);
-        vbo.draw(GL_LINE_STRIP, 0, pts.size());
+        vbo.draw(renderMode, 0, pts.size());
     }
 }
 
@@ -158,4 +160,15 @@ void Particle::avoidMouse(float minRad, float scl) {
         mouseVec.normalize();
         frc -= mouseVec * scl;
     }
+}
+
+//--------------------------------------------------------------
+void Particle::addNoiseForce(float scale) {
+    ofVec2f noiseFrc;
+    float fakeWindX = ofSignedNoise(pos.x * 0.003, pos.y * 0.006, ofGetElapsedTimef() * 0.6);
+    
+    noiseFrc.x = ofSignedNoise(uniquef, pos.y * 0.006) * 0.06;
+    noiseFrc.y = ofSignedNoise(uniquef, pos.x * 0.006, ofGetElapsedTimef()*0.2) * 0.06;
+    noiseFrc *= scale;
+    frc += noiseFrc;
 }
