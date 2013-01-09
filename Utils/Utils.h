@@ -187,6 +187,24 @@ static ofPolyline ofPolylineFromVec2f(const vector<ofVec2f>&p) {
     for(int i=0; i<p.size(); i++) poly.addVertex(p[i]);
     return poly;
 }
+
+static string ofPadWithZero(int v) {
+    string s = "";
+    if(v<=9) s += "0";
+    s += ofToString(v);
+    return s;
+}
+
+static string ofGetConcatenatedString(string &str, int maxLength, int nDots=3) {
+    int len = str.size();
+    string outstr = str;
+    if(len > maxLength) {
+        outstr = str.substr(0, maxLength);
+        for(int i=0; i<nDots; i++) outstr += ".";
+    }
+    return outstr;
+}
+
 //--------------------------------------------------------------
 // Drawing
 //--------------------------------------------------------------
