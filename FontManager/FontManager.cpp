@@ -20,7 +20,7 @@ TypeFace * FontManager::loadFont(int face, string path, int size) {
         FontManager::fonts[key].face = face;
         FontManager::fonts[key].size = size;
         FontManager::fonts[key].font.loadFont(path, size);
-        printf("Need to load font\n");
+        ofLog(OF_LOG_VERBOSE, "Need to load font:"+path);
     }
     return &FontManager::fonts[key];
 }

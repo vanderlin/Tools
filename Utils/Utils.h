@@ -402,8 +402,8 @@ class Utils {
 public:
 	
 	//--------------------------------------------------------------
-	static void saveWindowPosition();
-	static void loadWindowPosition();
+	static void saveWindowPosition(string filename="windowpos.txt");
+	static void loadWindowPosition(string filename="windowpos.txt");
 	
 	static void             saveData(string file, string data);
 	static string           loadData(string file);

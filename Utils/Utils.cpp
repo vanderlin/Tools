@@ -14,17 +14,17 @@ map <string, float*>    Utils::floatData;
 
 
 //--------------------------------------------------------------
-void Utils::saveWindowPosition() {
+void Utils::saveWindowPosition(string filename) {
 	ofstream f;
-	f.open(ofToDataPath("windowpos.txt").c_str());
+	f.open(ofToDataPath(filename).c_str());
 	f << ofGetWindowPositionX() << "," << ofGetWindowPositionY();
 	f.close();
 }
 
 //--------------------------------------------------------------
-void Utils::loadWindowPosition() {
+void Utils::loadWindowPosition(string filename) {
 	ifstream f;
-	f.open(ofToDataPath("windowpos.txt").c_str());
+	f.open(ofToDataPath(filename).c_str());
 	string winstr;
 	if(f!=0) {
 		while (!f.eof()) {
