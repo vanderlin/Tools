@@ -83,16 +83,29 @@ void GuiSlider::draw(float px, float py) {
 	if(bDrawInfo) {
         
 		ofSetColor(style.textColor);
-		
+		string lb = "";
+        if(style.bDrawName) lb = name;
+        lb += " "+ofToString(getValue(), bIsInt?0:1);
+        
 		if(GuiStyle::font.isLoaded()) {
-			GuiStyle::font.drawString(ofToString(getValue(), bIsInt?0:2), x+width+5+style.typeOffset.x, y+style.typeOffset.y);
-			if(style.bDrawName) GuiStyle::font.drawString(name, x+5-offset.x+style.typeOffset.x, y+style.typeOffset.y);
+            GuiStyle::font.drawString(lb, x+width+10-offset.x+style.typeOffset.x, y+style.typeOffset.y);
 		}
 		else {
-			ofDrawBitmapString(ofToString(getValue(), bIsInt?0:2), x+width+5+style.typeOffset.x, y+style.typeOffset.y);
-			if(style.bDrawName) ofDrawBitmapString(name, x+5-offset.x+style.typeOffset.x, y+style.typeOffset.y);
+            ofDrawBitmapString(lb, x+width+10-offset.x+style.typeOffset.x, y+style.typeOffset.y);
 		}
 	}
+    
+    /*
+    if(bUseLabel) {
+        if(GuiStyle::font.isLoaded()) {
+            ofSetColor(style.textColor);
+            GuiStyle::font.drawString(name, x+width+10, (y+8)-cy);
+        }
+        else {
+            ofSetColor(style.textColor);
+            ofDrawBitmapString(name, x+width+10, (y+8)-cy);
+        }
+    }*/
 }
 
 //--------------------------------------------------------------

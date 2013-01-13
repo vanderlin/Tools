@@ -67,7 +67,7 @@ GuiStyle::GuiStyle() {
 	headerTextColor.setHex(0x3d4747);	
 	
     typeOffset.set(10, 8);
-	sliderOffset.set(85, 0);
+	sliderOffset.set(10, 0);
     buttonOffset.set(10, 0);
     labelOffset.set(0, 0);
 }
