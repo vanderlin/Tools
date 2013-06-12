@@ -25,7 +25,7 @@ void GuiLabel::draw(float px, float py) {
     string info = " ";
     if(infoPtr != NULL) {
         info += (*infoPtr);    
-        info = ofTruncate(info, 20);
+        info = ofGetConcatenatedString(info, 20);
     }
     
     if(valuePtrF != NULL) {

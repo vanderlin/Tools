@@ -11,23 +11,23 @@
 
 GuiSlider::GuiSlider() {
     
-    bIsInt      = false;
-	bDrawInfo   = true;
-	valuePtrF   = NULL;
-    valuePtrI   = NULL;
-    
-    smoothValue = 0;
-	value       = 0.0;
-	min         = 0;
-	max         = 0;
-	offset      = defaultGuiStyle.sliderOffset;
+    bIsInt          = false;
+	bDrawInfo       = true;
+	valuePtrF       = NULL;
+    valuePtrI       = NULL;
+    precisionMode   = false;
+    smoothValue     = 0;
+	value           = 0.0;
+	min             = 0;
+	max             = 0;
+	offset          = defaultGuiStyle.sliderOffset;
 	
     setSize(defaultGuiStyle.sliderW, defaultGuiStyle.sliderH);
 }
 
 //--------------------------------------------------------------
 void GuiSlider::setStyle(GuiStyle &newStyle) {
-    style = newStyle;
+    style  = newStyle;
     offset = newStyle.sliderOffset;
 	setSize(newStyle.sliderW, newStyle.sliderH);
     style.typeOffset = newStyle.typeOffset;
@@ -71,29 +71,34 @@ void GuiSlider::draw(float px, float py) {
   //  if(valuePtrF) setValue((*valuePtrF));
     // if(valuePtrI) setValue(*valuePtrI);
     
+    
 	x = px+offset.x;
 	y = py+offset.y;
 	
 	ofFill();
-	bOver ? ofSetColor(style.baseHoverColor) : ofSetColor(style.baseColor);	
-	ofRect(x, y, width, height);
+	bOver ? ofSetColor(style.baseHoverColor) : ofSetColor(style.baseColor);
+    ofRect(x, y, width, height);
 	
 	ofSetColor(style.sliderBarColor);
-	ofRect(x, y, (float)width*getValuef(), height);	
+	if(precisionMode) ofSetColor(234, 198, 88, 200);
+    ofRect(x, y, (float)width*getValuef(), height);
 	if(bDrawInfo) {
         
 		ofSetColor(style.textColor);
 		string lb = "";
         if(style.bDrawName) lb = name;
-        lb += " "+ofToString(getValue(), bIsInt?0:1);
-        
+        lb += " "+ofToString(getValue(), bIsInt?0:3);
+        if(precisionMode) lb += " Precision Mode";
 		if(GuiStyle::font.isLoaded()) {
             GuiStyle::font.drawString(lb, x+width+10-offset.x+style.typeOffset.x, y+style.typeOffset.y);
 		}
 		else {
             ofDrawBitmapString(lb, x+width+10-offset.x+style.typeOffset.x, y+style.typeOffset.y);
 		}
-	}
+	
+    }
+    
+    
     
     /*
     if(bUseLabel) {
@@ -125,12 +130,38 @@ void GuiSlider::mousePressed(int mx, int my) {
 void GuiSlider::mouseDragged(int mx, int my) {
 	float msx = mx;
     if(bPressed) {
-        if(ofGetKeyPressed(9)) {
-            smoothValue += ( ofMap(msx, x, width+x, 0.0, 1.0, true) - smoothValue ) * .02;
+
+        
+        if(bPressed) {
+            float dy = my-y;
+            precisionMode = dy > 50;
         }
-        else         {
+        
+        //if(ofGetKeyPressed(9)) {
+        //    smoothValue += ( ofMap(msx, x, width+x, 0.0, 1.0, true) - smoothValue ) * .02;
+        //}
+        //else         {
+        //}
+		if(precisionMode) {
+            //smoothValue += ( ofMap(msx, x, width+x, 0.0, 1.0, true) - smoothValue ) * .02;
+            smoothValue = ofMap(msx, 0, ofGetWidth(), 0.0, 1.0, true);
+            //smoothValue = ofMap(msx, x, width+x, 0.0, 1.0, true) * 0.2;
+        }
+        else {
             smoothValue = ofMap(msx, x, width+x, 0.0, 1.0, true);
         }
-		setValueNormal(smoothValue);
+        setValueNormal(smoothValue);
+        
+        
 	}
 }
+
+//--------------------------------------------------------------
+void GuiSlider::mouseReleased(int mx, int my) {
+    precisionMode = false;
+    GuiElement::mouseReleased(mx, my);
+}
+
+
+
+

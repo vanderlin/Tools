@@ -23,7 +23,8 @@ public:
 	void	mousePressed(int mx, int my);
 	void	mouseDragged(int mx, int my);
 	void	mouseMoved(int mx, int my );
-	
+    void    mouseReleased(int mx=0, int my=0);
+
 	void	setValue(float val);
 	void	setValueNormal(float nVal);
 	float	getValue();
@@ -38,4 +39,5 @@ public:
 	float * valuePtrF;
     int   * valuePtrI;
 	bool	bDrawInfo;
+    bool    precisionMode;
 };

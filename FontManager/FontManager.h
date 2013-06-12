@@ -38,7 +38,6 @@ public:
     static map <string, TypeFace> fonts;
     static void addFontKeyPath(int key, string path);
     static string getPathFromKey(int key);
-    static void loadFonts();
     static void draw(int face, string str, int size, float x, float y, int textAlign=FontManager::ALIGN_BOTTOM, int justify=FontManager::JUSTIFY_LEFT);
     static void draw(int face, string str, int size, ofPoint pt, int textAlign=FontManager::ALIGN_BOTTOM, int justify=FontManager::JUSTIFY_LEFT);
     static void drawCentered(int face, string str, int size, float x, float y, float centerWidth, int textAlign=FontManager::ALIGN_BOTTOM, int justify=FontManager::JUSTIFY_LEFT);
@@ -46,5 +45,5 @@ public:
     static string fitStringInWidth(int face, int size, string inStr, float maxWidth);
     static TypeFace * loadFont(int face, string path, int size);
     static TypeFace * getFont(int face, int size);
-    
+    static ofRectangle getBoundingBox(int face, int size, string str);
 };

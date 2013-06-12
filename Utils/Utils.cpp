@@ -9,10 +9,6 @@
 
 #include "Utils.h"
 
-map <string, ofPoint*>  Utils::pntData;
-map <string, float*>    Utils::floatData;
-
-
 //--------------------------------------------------------------
 void Utils::saveWindowPosition(string filename) {
 	ofstream f;
@@ -39,100 +35,6 @@ void Utils::loadWindowPosition(string filename) {
 }
 
 //--------------------------------------------------------------
-void Utils::addPoint(string name, ofPoint * pt) {
-    pntData[name] = pt;
-}
-
-void Utils::addFloat(string name, float * f) {
-    floatData[name] = f;  
-}
-
-
-
-ofPoint Utils::getPoint(string name) {
-  return ofPoint(*pntData[name]);
-}
-float Utils::getFloat(string name) {
-    return *floatData[name];
-}
-
-//--------------------------------------------------------------
-void Utils::loadAppSettings(string file) {
-    
-    ifstream f;
-	f.open(ofToDataPath(file).c_str());
-	string winstr;
-	if(f!=0) {
-        int lineNum = 0;
-		while (!f.eof()) {
-            string line;
-			getline(f, line);
-            
-            // each line is a type 
-            // 0 = points
-            // 1 = floats
-            
-            vector<string> objs = ofSplitString(line, "*");
-            for(int i=0; i<objs.size(); i++) {
-                
-                vector<string> obj = ofSplitString(objs[i], "|");
-                if(obj.size() >= 2) {
-                    
-                    string name = obj[0];
-                    vector<string>vals = ofSplitString(obj[1], ",");
-                    ofPoint v;
-                    for(int j=0; j<vals.size(); j++) {
-                        v[j] = ofToFloat(vals[j]);
-                    }
-                    
-                    if(lineNum == 0 &&  pntData[name]) pntData[name]->set(v);
-                    if(lineNum == 1)                  *floatData[name] = v.x;
-                }
-
-            }
-            
-            lineNum ++;
-		}
-		f.close();
-        
-	}
-    
-}
-
-
-//--------------------------------------------------------------
-void Utils::saveAppSettings(string file) {
-    ofstream f;
-	f.open(ofToDataPath(file).c_str());
-    
-    
-    // points
-    map<string, ofPoint*>::iterator pntIter;
-    
-    for(pntIter = pntData.begin(); pntIter != pntData.end(); pntIter++) {
-        if(pntIter->second) {
-            cout << pntIter->second->x << endl;
-            f << pntIter->first << "|";
-            f << ofToString(pntIter->second->x) << "," << ofToString(pntIter->second->y) << "," << ofToString(pntIter->second->z) << "*";
-        }
-    }
-    
-    f << endl;
-
-    // floats
-    map<string, float*>::iterator floatItr;
-    
-    for(floatItr = floatData.begin(); floatItr != floatData.end(); floatItr++) {
-        float val = *floatItr->second;
-        f << floatItr->first << "|";
-        f << ofToString(val) << "*";
-    }
-    
-	f.close();
-}
-
-
-//--------------------------------------------------------------
 void Utils::pushMask(ofRectangle &r) {
 	Utils::pushMask(r.x, r.y, r.width, r.height);
 }
@@ -157,39 +59,6 @@ void Utils::drawArrow(float x, float y, float w, float h, float angle) {
 }
 void Utils::drawArrow(ofVec2f &p, float w, float h, float angle) {
 	Utils::drawArrow(p.x, p.y, w, h, angle);
-}
-
-
-//--------------------------------------------------------------
-void Utils::savePoints(vector <ofVec2f> &pts, string file) {
-	ofstream f;
-	f.open(ofToDataPath(file).c_str());
-	for (int i=0; i<pts.size(); i++) {
-		f << pts[i].x << "," << pts[i].y;
-		if(i != pts.size()-1)  f << ",";
-	}
-	f.close();
-}
-
-//--------------------------------------------------------------
-vector <ofVec2f> Utils::loadPoints(string file) {
-	ifstream f;
-	f.open(ofToDataPath(file).c_str());
-	string str;
-	vector <ofVec2f> pts;
-	
-	if(f!=0) {
-		while (!f.eof()) {
-			getline(f, str);
-		}
-		f.close();
-		vector <string> p = ofSplitString(str, ",");
-		for (int i=0; i<p.size(); i+=2) {
-			pts.push_back(ofVec2f(ofToFloat(p[i]), ofToFloat(p[i+1])));
-		}
-	}
-	
-	return pts;
 }
 /*
 //--------------------------------------------------------------
@@ -238,46 +107,6 @@ vector <ofPolyline> Utils::loadPolyPoints(string file) {
 	
 	return pts;
 }*/
-
-//--------------------------------------------------------------
-void Utils::saveData(string file, string data) {
-	ofstream f;
-	f.open(ofToDataPath(file).c_str());
-	f << data;
-	f.close();
-}
-
-//--------------------------------------------------------------
-string Utils::loadData(string file) {
-	ifstream f;
-	f.open(ofToDataPath(file).c_str());
-	string str;
-	if(f!=0) {
-		while (!f.eof()) {
-			getline(f, str);
-		}
-		f.close();
-	}	
-	return str;
-}
-
-//--------------------------------------------------------------
-vector <string> Utils::loadDataArray(string file) {
-    vector <string> lines;
-	ifstream f;
-	f.open(ofToDataPath(file).c_str());
-	if(f!=0) {
-		while (!f.eof()) {
-            string str;
-			getline(f, str);
-            lines.push_back(str);
-		}
-		f.close();
-	}	
-	return lines;
-}
-
-
 
 //--------------------------------------------------------------
 void Utils::drawGrid(float w, float h) {

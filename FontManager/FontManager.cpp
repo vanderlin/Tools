@@ -50,9 +50,7 @@ TypeFace * FontManager::getFont(int face, int size) {
 //--------------------------------------------------------------
 string FontManager::fitStringInWidth(int face, int size, string inStr, float maxWidth) {
     
-    
     TypeFace * f = getFont(face, size);
-
     float runningWidth = 0;
     string outString   = "";
     string currLine    = "";
@@ -60,14 +58,18 @@ string FontManager::fitStringInWidth(int face, int size, string inStr, float max
     int wordsInLine = 0;
     for(int i=0; i<words.size(); i++) {
         string word      = words[i];
-        string lineBreak = " ";
+        string nextWord  = i<words.size()-1?words[i+1]:"";
+        string lineBreak = i<words.size()-1?" ":"";
         currLine += word + lineBreak;
         wordsInLine ++;
-        ofRectangle rect = f->font.getStringBoundingBox(currLine+(i<words.size()-1?words[i+1]:""), 0, 0);
-
-        ofDrawBitmapString(currLine+"  "+ofToString(rect.width)+"/"+ofToString(maxWidth)+"  "+ofToString(wordsInLine), 20, 20 + (i*25));//.c_str(), runningWidth);
+        ofRectangle rect = f->font.getStringBoundingBox(currLine + nextWord, 0, 0);
         
+        //ofRect(100+xpos, 100+ypos, rect.width, rect.height);
+        //printf("%s -  %f / %f\n", currLine.c_str(), rect.width, maxWidth);
+        // ofDrawBitmapString(currLine+"  "+ofToString(rect.width)+"/"+ofToString(maxWidth)+"  "+ofToString(wordsInLine), 20, 20 + (i*25));//.c_str(), runningWidth);
         if(rect.width >= maxWidth) {
+           
+            
             bool bWordToLongForBox = false;
             if(wordsInLine == 1) {
                 string newWord = "";
@@ -77,7 +79,7 @@ string FontManager::fitStringInWidth(int face, int size, string inStr, float max
                     string nextLetter = "";
                     if(j<currLine.size()-1)nextLetter += currLine[j];
                     ofRectangle wrdRect = f->font.getStringBoundingBox(newWord+nextLetter+"-", 0, 0);
-                    if(wrdRect.width>maxWidth) {
+                    if(wrdRect.width>=maxWidth) {
                         newWord = "";
                         outWord += "-\n";
                     }
@@ -95,6 +97,8 @@ string FontManager::fitStringInWidth(int face, int size, string inStr, float max
             currLine = "";
             runningWidth = 0;
             wordsInLine = 0;
+            words[i] += "\n";
+            lineBreak = "";
         }
         
         runningWidth += rect.width;
@@ -104,6 +108,14 @@ string FontManager::fitStringInWidth(int face, int size, string inStr, float max
     return outString;
 }
 
+//--------------------------------------------------------------
+// I made my won cause ofTrueTypeFont is being weird...
+//--------------------------------------------------------------
+ofRectangle FontManager::getBoundingBox(int face, int size, string str) {
+    ofRectangle r;
+    r = FontManager::getFont(face, size)->font.getStringBoundingBox(str, 0, 0);
+    return  r;
+}
 
 //--------------------------------------------------------------
 void FontManager::draw(int face, string str, int size, float x, float y, int textAlign, int justify) {
@@ -121,12 +133,14 @@ void FontManager::draw(int face, string str, int size, float x, float y, int tex
     }
   
     if(f) {
-        float th = f->font.stringHeight(str);
-        if(textAlign==FontManager::ALIGN_TOP) y += th;
-        if(textAlign==FontManager::ALIGN_MIDDLE) y += (th/2);
+        float singleLineHeight = FontManager::getFont(face, size)->font.stringHeight("T");
+        ofRectangle rec = FontManager::getBoundingBox(face, size, str);
+        if(textAlign==FontManager::ALIGN_BOTTOM) y -= (rec.height - singleLineHeight);
+        if(textAlign==FontManager::ALIGN_TOP)    y += singleLineHeight;
+        if(textAlign==FontManager::ALIGN_MIDDLE) y += (rec.height/2);
         
-        if(justify==FontManager::JUSTIFY_RIGHT) x -= f->font.stringWidth(str);
-        if(justify==FontManager::JUSTIFY_MIDDLE) x-= f->font.stringWidth(str) / 2;
+        if(justify==FontManager::JUSTIFY_RIGHT)  x -= f->font.stringWidth(str);
+        if(justify==FontManager::JUSTIFY_MIDDLE) x -= f->font.stringWidth(str) / 2;
         
         f->font.drawString(str, x, y);
     }

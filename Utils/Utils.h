@@ -9,8 +9,10 @@
 
 #pragma once
 #include "ofMain.h"
+#include "ofxXmlSettings.h"
+#include <map>
 
-static float inToPx(float v) {
+static float ofInToPx(float v) {
     return v * 72.0; 
 }
 
@@ -55,8 +57,9 @@ static ofVec3f ofGetNoiseForce( const ofVec3f& a_loc, float a_mult, float a_off 
 	return frc;
 }
 
+
 //--------------------------------------------------------------
-// Random
+#pragma mark --- Random Helpers ---
 //--------------------------------------------------------------
 static ofColor ofRandomColor() {
 	return ofColor(ofRandom(255), ofRandom(255), ofRandom(255));
@@ -69,14 +72,14 @@ static ofVec3f ofRandomVec3f(float min=-1, float max=1) {
 }
 
 // ------------------------------------------------
-// Helpers
+#pragma mark --- App Helpers ---
 // ------------------------------------------------
 static float ofDist(const ofVec2f &a, const ofVec2f &b) {
     return ofDist(a.x, a.y, b.x, b.y);
 }
 
 // ------------------------------------------------
-static float isPointInScreen(const ofVec2f &pt, float padding=0) {
+static float isPointInScreen(const ofPoint &pt, float padding=0) {
     ofRectangle screen(-padding, -padding, ofGetWidth()+(padding*2), ofGetHeight()+(padding*2)); 
     return screen.inside(pt);
 }
@@ -120,12 +123,43 @@ static ofVec2f ofGetMouseVel() {
     return ofVec2f(ofGetMouseX()-ofGetPreviousMouseX(),ofGetMouseY()-ofGetPreviousMouseY());
 }
 
+#pragma mark --- XML UTILS ---
+//--------------------------------------------------------------
+// XML Utils
+//--------------------------------------------------------------
+static void ofSetXmlRectangle(ofxXmlSettings &xml, ofRectangle &rect, string tag) {
+    xml.setValue(tag+"_x", rect.x);
+    xml.setValue(tag+"_y", rect.y);
+    xml.setValue(tag+"_w", rect.width);
+    xml.setValue(tag+"_h", rect.height);
+}
+static ofRectangle ofGetXmlRectangle(ofxXmlSettings &xml, string tag) {
+    ofRectangle rect;
+    rect.x      = xml.getValue(tag+"_x", rect.x);
+    rect.y      = xml.getValue(tag+"_y", rect.y);
+    rect.width  = xml.getValue(tag+"_w", rect.width);
+    rect.height = xml.getValue(tag+"_h", rect.height);
+    return rect;
+}
+static void ofSetXmlPoint(ofxXmlSettings &xml, ofPoint &pt, string tag) {
+    xml.setValue(tag+"_x", pt.x);
+    xml.setValue(tag+"_y", pt.y);
+}
+static ofPoint ofGetXmlPoint(ofxXmlSettings &xml, string tag) {
+    ofPoint pt;
+    pt.x = xml.getValue(tag+"_x", pt.x);
+    pt.y = xml.getValue(tag+"_y", pt.y);
+    return pt;
+}
+
+
+#pragma mark --- UTILS ---
 //--------------------------------------------------------------
 // Utils
 //--------------------------------------------------------------
 template<class T>
 static int ofRandomIndex(vector<T>&items) {
-    if(items.size()==0) return 0;
+    if(items.size()==0) return -1;
     return (int)ofRandom(0, (int)(items.size()));
 }
 template<class T>
@@ -187,10 +221,15 @@ static ofPolyline ofPolylineFromVec2f(const vector<ofVec2f>&p) {
     for(int i=0; i<p.size(); i++) poly.addVertex(p[i]);
     return poly;
 }
+static ofPolyline ofPolylineFromPoints(const vector<ofPoint>&p) {
+    ofPolyline poly;
+    for(int i=0; i<p.size(); i++) poly.addVertex(p[i]);
+    return poly;
+}
 
-static string ofPadWithZero(int v) {
+static string ofPadWithZero(int v, int nZeros=1) {
     string s = "";
-    if(v<=9) s += "0";
+    if(v<=9) for(int i=0; i<nZeros; i++) s += "0";
     s += ofToString(v);
     return s;
 }
@@ -205,6 +244,88 @@ static string ofGetConcatenatedString(string &str, int maxLength, int nDots=3) {
     return outstr;
 }
 
+static string ofGetFPSstring() {
+    return "FPS "+ofToString(ofGetFrameRate(), 0);
+}
+static ofColor ofHexColor(const int hex) {
+    ofColor c;
+    c.setHex(hex);
+    return c;
+}
+
+static float cross(const ofPoint &O, const ofPoint &A, const ofPoint &B) {
+	return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+}
+static bool lexicographicallyPointCmp(const ofPoint &a, const ofPoint &b) {
+    return a.x < b.x || (a.x == b.x && a.y < b.y);
+}
+// Returns a list of points on the convex hull in counter-clockwise order.
+// Note: the last point in the returned list is the same as the first one.
+static vector<ofPoint> ofGetConvexHull(const vector <ofPoint> &pts) {
+    vector <ofVec2f> P;
+    for (int i=0;i<pts.size();i++) P.push_back(pts[i]);
+    
+	int n = (int)P.size();
+    int k = 0;
+	vector <ofPoint> H(2*n);
+	
+	// Sort points lexicographically
+	sort(P.begin(), P.end(), lexicographicallyPointCmp);
+	
+	// Build lower hull
+	for (int i = 0; i < n; i++) {
+		while (k >= 2 && (cross(H[k-2], H[k-1], P[i]) <= 0)) k--;
+		H[k++] = P[i];
+	}
+	
+	// Build upper hull
+	for (int i = n-2, t = k+1; i >= 0; i--) {
+		while (k >= t && (cross(H[k-2], H[k-1], P[i]) <= 0)) k--;
+		H[k++] = P[i];
+	}
+	
+	H.resize(k);
+	return H;
+}
+
+static string ofCharToString(char c) {
+    string s;
+    s += c;
+    return s;
+}
+
+#pragma mark --- IMAGES ---
+//--------------------------------------------------------------
+// Images
+//--------------------------------------------------------------
+static ofImage ofCropFromCenter(ofImage &img, float cropW, float cropH) {
+    float cropX = 0;
+    float cropY = 0;
+    ofImage crop = img;
+    float rt = img.getHeight()/img.getWidth();
+    float cw = cropW;
+    float ch = cropH * rt;
+    
+    if(ch < cw) {
+        rt = img.getWidth()/img.getHeight();
+        cw = (cropW) * rt;
+        ch = cropH;
+        
+        cropX = -(cropW-cw)/2;
+        cropY = -(cropH-ch)/2;
+    }
+    
+    crop.resize(cw, ch);
+    crop.crop(cropX, cropY, cropW, cropH);
+    
+    return crop;
+}
+
+static int ofGetGrayValue(const ofColor &c) {
+    return (c.r+c.g+c.b)/3;
+}
+
+#pragma mark --- DRAWING ---
 //--------------------------------------------------------------
 // Drawing
 //--------------------------------------------------------------
@@ -237,6 +358,13 @@ static void ofDot(const ofPoint &p) {
 }
 
 
+static void ofDrawCenteredTriangle(float x, float y, float w=10, float h=10) {
+    ofTriangle(-w/2 + x, h/2 + y, x, -h/2 + y, w/2 + x, h/2 + y);
+}
+static void ofDrawCenteredTriangle(const ofPoint &pt, float w=10, float h=10) {
+    ofDrawCenteredTriangle(pt.x, pt.y, w, h);
+}
+
 static void drawFPS(float x, float y, float w=60, float h=20) {
   
     string fps = "FPS "+ofToString(ofGetFrameRate(), 0);
@@ -262,6 +390,7 @@ static void drawMouseCoords() {
 
 static void drawFloor(float w, float h) {
     
+#ifndef TARGET_OF_IPHONE
     /*
      a     b
      
@@ -282,7 +411,7 @@ static void drawFloor(float w, float h) {
     glVertex3fv(&pc[0]); glVertex3fv(&pd[0]);
     glEnd();
     ofPopMatrix();
-    
+#endif
 }
 
 static void drawGrid(float w, float h, int numCols=10, int numRows=10) {
@@ -349,21 +478,12 @@ static ofVec2f ofGetMouseNormal() {
     return ofVec2f(ofMap(ofGetMouseX(), 0.0, ofGetWidth(), 0.0, 1.0, true), ofMap(ofGetMouseY(), 0.0, ofGetHeight(), 0.0, 1.0, true));
 }
 
-static ofVec2f ofGetCenterScreen() {
-    return ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
+static ofPoint ofGetCenterScreen() {
+    return ofPoint(ofGetWidth()/2, ofGetHeight()/2);
 }
 
 //--------------------------------------------------------------
 // String
-//--------------------------------------------------------------
-static string ofTruncate(string &str, int max, bool addDotDotDot=true) {
-    if(str.length() >= max) {
-        str = str.substr(0, max);
-        if(addDotDotDot) str += "...";
-    }
-    return str;
-}
-
 //-------------------------------------------------------------- (this may be making a bug)!!!
 static void readDirectory(string path, vector<ofFile>&files, vector<string>allowedExt) {	
 	
@@ -395,30 +515,13 @@ static void readDirectory(string path, vector<ofFile>&files, string allowedExt) 
 
 //--------------------------------------------------------------
 class Utils {
-
-    static map <string, ofPoint*>   pntData;
-    static map <string, float*>     floatData;
-    
+  
 public:
 	
 	//--------------------------------------------------------------
 	static void saveWindowPosition(string filename="windowpos.txt");
 	static void loadWindowPosition(string filename="windowpos.txt");
 	
-	static void             saveData(string file, string data);
-	static string           loadData(string file);
-	static vector <string>  loadDataArray(string file);
-
-    //--------------------------------------------------------------
-    static void     addPoint(string name, ofPoint * pt);
-    static void     addFloat(string name, float * f);
-
-    static ofPoint  getPoint(string name);
-    static float    getFloat(string name);
-    
-	static void loadAppSettings(string file="settings.txt");
-    static void saveAppSettings(string file="settings.txt");
-    
 	//--------------------------------------------------------------
 	static void pushMask(ofRectangle &r);
 	static void pushMask(float x, float y, float width, float height);
@@ -428,10 +531,6 @@ public:
 	static void drawArrow(float x, float y, float w, float h, float angle=0);
 	static void drawArrow(ofVec2f &p, float w, float h, float angle=0);
 	static void drawGrid(float w, float h);
-	
-	//--------------------------------------------------------------
-	static void savePoints(vector <ofVec2f> &pts, string file);
-	static vector <ofVec2f> loadPoints(string file);
 	
 	static void drawRect3d(float x, float y, float w, float h, float d) {
 		ofPushMatrix();
@@ -495,7 +594,7 @@ public:
     
     //--------------------------------------------------------------
     static void drawArc(float cx, float cy, float innerArc, float outerArc, float startAngle, float arcAngle, int numSegments, ofColor startColor, ofColor endColor) {
-        
+#ifndef TARGET_OF_IPHONE
         vector<ofVec2f> inner = Utils::getArc(cx, cy, innerArc, startAngle, arcAngle, numSegments);
         vector<ofVec2f> outer = Utils::getArc(cx, cy, outerArc, startAngle, arcAngle, numSegments);
         
@@ -510,7 +609,7 @@ public:
             
         }
         glEnd();
-        
+#endif
     }
     static void drawArc(ofPoint pt, float innerArc, float outerArc, float startAngle, float arcAngle, int numSegments, ofColor startColor, ofColor endColor) {
         Utils::drawArc(pt.x, pt.y, innerArc, outerArc, startAngle, arcAngle, numSegments, startColor, endColor);
@@ -554,7 +653,40 @@ class DragPoint : public ofVec3f {
     }
 };
 
+//--------------------------------------------------------------
+class JsonMaker {
+  
+public:
+    
+    map <string, string> keyPairs;
+    
+    void add(string key, bool val) {
+        keyPairs[key] = val?"true":"false";
+    }
+    void add(string key, int val) {
+        keyPairs[key] = ofToString(val);
+    }
+    void add(string key, float val) {
+        keyPairs[key] = ofToString(val);
+    }
+    void add(string key, const char* val) {
+        keyPairs[key] = val;
+    }
+    
+    string getJsonString() {
+        string json = "{";
+        int inc = 0;
+        for (map<string,string>::iterator it=keyPairs.begin(); it!=keyPairs.end(); ++it) {
+            json += "\""+it->first+"\":"+"\""+it->second+"\"";
+            if(inc!=keyPairs.size()-1) json += ",";
+            inc ++;
+        }
+        json += "}";
+        cout << json << endl;
+        return json;
+    }
 
+};
 
 
 

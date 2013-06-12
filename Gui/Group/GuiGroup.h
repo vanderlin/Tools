@@ -15,17 +15,23 @@
 #include "GuiButton.h"
 #include "GuiImage.h"
 #include "GuiLabel.h"
+#include "GuiCheckBox.h"
 
 enum {
     GUI_OVER_GROUP,
     GUI_PRESSED_GROUP,
     GUI_RELEASED_GROUP,
+    GUI_VALUE_CHANGED
 };
 
 class GuiEventArgs : public ofEventArgs {
 
     public:
     int type;
+    GuiElement * object;
+    GuiEventArgs() {
+        object = NULL;
+    }
 };
 
 class GuiGroup : public ofRectangle {
@@ -37,15 +43,16 @@ private:
     bool   bDownInside;
 public:
 	
-    ofEvent <GuiEventArgs>       guiEvents;
+    ofEvent <GuiEventArgs>      guiEvents;
 	static vector <GuiGroup*>	groups;
 	string						name;
 	GuiStyle					style;
 	vector <GuiElement*>		elements;
 	bool						bHide;
 	bool                        bDrawFPS;
-    static bool					inGroup;
-	
+    bool                        inGroup;
+	static bool                 inAGroup;
+    
 	GuiGroup();
     ~GuiGroup();
     
@@ -65,9 +72,9 @@ public:
 	GuiSlider	   * addSlider(string name, float*valuePtr, float min, float max, float initVal=0);
 	GuiSlider	   * addSlider(string name, int*valuePtr, float min, float max, int initVal=0);
 	GuiButton      * addButton(string name, bool*valuePtr, bool initVal=true, bool isToggle=false);
-	GuiRangeSlider * addRangeSlider(string name, float *minPtr, float *maxPtr, float min, float max);
+	GuiRangeSlider * addRangeSlider(string name, float *minPtr, float *maxPtr, float min, float max, float defaultMin=0, float defaultMax=1, bool isInt=false);
 	GuiImage	   * addImage(ofBaseDraws * bd, float drawWidth);
-	
+	GuiCheckBox    * addCheckBox(string name, map <string, int> &boxes, int *value, int initVal=0);
     GuiLabel       * addLabel(string name, string * info=NULL);
 	GuiLabel       * addLabel(string name, float * value);
 	GuiLabel       * addLabel(string name, int   * value);
@@ -75,9 +82,24 @@ public:
 	//--------------------------------------------------------------
 	float getBottomPos() { return y+height; }
 	bool  getMouseDownInside() {return bDownInside; }
-    
+    float getHeight() const {
+        float gy		  = 14 + 8;
+        float spaceH = defaultGuiStyle.spaceH;
+        for (int i=0; i<elements.size(); i++) {
+            GuiElement * e = elements[i];
+            if(e->type == GUI_CHECKBOX) {
+                GuiCheckBox * cb = (GuiCheckBox*)e;
+                spaceH = cb->getHeight() + 5;
+            }
+            else spaceH = defaultGuiStyle.spaceH;
+            gy += spaceH;
+        }
+        //height = gy; // auto resize (toggle?)
+        return gy;
+    }
     
 	//--------------------------------------------------------------
+    void loadDefaultFont();
 	void registerEvents();
     void enable();
     void disable();
@@ -131,5 +153,15 @@ public:
 		}
 	}
 	
-	
+	static bool insideGroup(int x, int y) {
+        
+        bool mouseInsideGroup = false;
+        for(int i=0; i<GuiGroup::groups.size(); i++) {
+            if((GuiGroup::groups[i]->inside(x, y) && !GuiGroup::groups[i]->bHide) || GuiGroup::groups[i]->bDownInside) {
+                mouseInsideGroup = true;
+                break;
+            }
+        }
+        return mouseInsideGroup;
+    }
 };

@@ -10,13 +10,13 @@
 #include "GuiGroup.h"
 
 vector <GuiGroup*> GuiGroup::groups;
-bool GuiGroup::inGroup = false;
+bool               GuiGroup::inAGroup = false;
 
 //--------------------------------------------------------------
 GuiGroup::GuiGroup() {
     bDownInside       = false;
 	bHide			  = false;
-	GuiGroup::inGroup = false;
+	inGroup           = false;
 	savepath		  = "GIU_ADD_NAME_PLEASE.txt";
     bEnable           = true;
     bDrawFPS          = false;
@@ -53,6 +53,42 @@ void GuiGroup::setup(string name, float x, float y, float w, float h) {
 }
 
 //--------------------------------------------------------------
+void GuiGroup::loadDefaultFont() {
+    // This is a crazy function but I like it
+    // just build and run and you get a font...
+    string pathToFont = "../../../../../../../addons/Tools/Gui/font/Arial.ttf";
+    string pathToApp  = "../../contents/MacOS";
+    bool bApp = ofDirectory::doesDirectoryExist(pathToApp, false);
+    
+    bool bFontExist = ofFile::doesFileExist(pathToApp+"/Arial.ttf",  false);
+    if(bFontExist) {
+        ofDisableDataPath();
+        if(!GuiStyle::font.loadFont(pathToApp+"/Arial.ttf", 9)) {
+            printf("Error loading font from app\n");
+        }
+        else printf("Font Loaded from app\n");
+        ofEnableDataPath();
+    }
+    else {
+        if(bApp) {
+            bool bCopied = ofFile::copyFromTo(pathToFont, pathToApp, false);
+            if(bCopied) {
+                printf("Copied font to app.\n");
+                ofDisableDataPath();
+                if(!GuiStyle::font.loadFont(pathToApp+"/Arial.ttf", 9)) {
+                    printf("Error loading font from app\n");
+                }
+                else printf("Font Loaded from app\n");
+                ofEnableDataPath();
+            }
+            else {
+                printf("Error copying font from app\n");
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------
 void GuiGroup::save() {
 	ofstream f;
 	f.open(ofToDataPath(savepath).c_str());
@@ -69,9 +105,19 @@ void GuiGroup::save() {
 			f << s->value;
 		}
 		
-		if(elements[i]->type == GUI_BUTTON) {
+		if(elements[i]->type == GUI_RANGE_SLIDER) {
+			GuiRangeSlider * b = (GuiRangeSlider*)elements[i];
+			f << *b->minPtr << ":" << *b->maxPtr;
+		}
+        
+        if(elements[i]->type == GUI_BUTTON) {
 			GuiButton * b = (GuiButton*)elements[i];
 			f << b->value;
+		}
+        
+        if(elements[i]->type == GUI_CHECKBOX) {
+			GuiCheckBox * b = (GuiCheckBox*)elements[i];
+			f << b->getSelectedBox();
 		}
 		
 		if(i!=elements.size()-1)f << ",";
@@ -101,11 +147,22 @@ void GuiGroup::load() {
 				float	value = ofToFloat(estr[2]);
 				for (int k=0; k<elements.size(); k++) {
 					
-					// slider
-                    if(elements[k]) {
+					if(elements[k]) {
+                        
+                        // slider
                         if(elements[k]->name.compare(name) == 0  && elements[k]->type == GUI_SLIDER) {
                             GuiSlider * s = (GuiSlider*)elements[k];
                             s->setValueNormal(value);
+                        }
+                    
+                        // range slider
+                        if(elements[k]->name.compare(name) == 0  && elements[k]->type == GUI_RANGE_SLIDER) {
+                            GuiRangeSlider * s = (GuiRangeSlider*)elements[k];
+                            vector<string>minmax = ofSplitString(estr[2], ":");
+                            if(minmax.size()>=2) {
+                                s->setValue(ofToFloat(minmax[0]), ofToFloat(minmax[1]));
+                            }
+                            
                         }
                         
                         // button
@@ -113,6 +170,13 @@ void GuiGroup::load() {
                             GuiButton * s = (GuiButton*)elements[k];
                             s->setValue(value);
                         }
+                        
+                        // checkbox
+                        if(elements[k]->name.compare(name) == 0 && elements[k]->type == GUI_CHECKBOX) {
+                            GuiCheckBox * s = (GuiCheckBox*)elements[k];
+                            s->selectBox((int)value);
+                        }
+                        
                     }
 				}
                 //printf("t:%i\nn:%s\nv:%f\n", type, name.c_str(), value);
@@ -165,6 +229,10 @@ void GuiGroup::draw() {
         
 		if(e->type == GUI_IMAGE && i == 0) gy = 14;
 		
+        if(e->type == GUI_CHECKBOX) spaceH = e->getHeight() + 5;
+        else spaceH = defaultGuiStyle.spaceH;
+        
+        
         // bg
         ofSetColor(i%2==0 ? 200 : 255, 100);
         ofRect(x, (y+gy)-5, width, spaceH);
@@ -180,7 +248,7 @@ void GuiGroup::draw() {
     if(bDrawFPS) {
         ofSetColor(style.headerTextColor);
         if(GuiStyle::font.isLoaded()) {
-            GuiStyle::font.drawString("FPS "+ofToString(ofGetFrameRate(), 0), round(x+5+(width-45)), round(y+11));
+            GuiStyle::font.drawString("FPS "+ofToString(ofGetFrameRate(), 0), round(x+5+(width-58)), round(y+11));
         }
         else ofDrawBitmapString("FPS "+ofToString(ofGetFrameRate(), 0), round(x+5+(width-60)), round(y+12));        
     }
@@ -224,9 +292,15 @@ GuiSlider * GuiGroup::addSlider(string name, int*valuePtr, float min, float max,
 }
 
 //--------------------------------------------------------------
-GuiRangeSlider * GuiGroup::addRangeSlider(string name, float *minPtr, float *maxPtr, float min, float max) {
+GuiRangeSlider * GuiGroup::addRangeSlider(string name, float *minPtr, float *maxPtr, float min, float max, float defaultMin, float defaultMax, bool isInt) {
 	GuiRangeSlider * e = (GuiRangeSlider*)add(new GuiRangeSlider(), GUI_RANGE_SLIDER);
 	e->name = name;
+    e->minPtr = minPtr;
+    e->maxPtr = maxPtr;
+    e->bIsInt = isInt;
+    e->setMinMaxRange(min, max);
+    e->setValue(MAX(min, defaultMin), MIN(max, defaultMax));
+
 	//e->valuePtr = valuePtr;
 	return e;
 }
@@ -275,6 +349,18 @@ GuiLabel * GuiGroup::addLabel(string name, int * value) {
 }
 
 //--------------------------------------------------------------
+GuiCheckBox * GuiGroup::addCheckBox(string name, map <string, int> &boxes, int *value, int initVal) {
+    GuiCheckBox * e = (GuiCheckBox*)add(new GuiCheckBox(), GUI_CHECKBOX);
+    for(map<string, int>::iterator it=boxes.begin(); it!=boxes.end(); ++it) {
+        e->addBox(it->first, it->second);
+    }
+    e->name     = name;
+    e->valuePtr = value;
+    e->selectBox(initVal);
+    return e;
+}
+
+//--------------------------------------------------------------
 void GuiGroup::registerEvents() {
 	ofAddListener(ofEvents().mouseMoved, this, &GuiGroup::mouseMoved);
 	ofAddListener(ofEvents().mouseDragged, this, &GuiGroup::mouseDragged);
@@ -294,29 +380,41 @@ void GuiGroup::disable() {
 
 //--------------------------------------------------------------
 void GuiGroup::mouseMoved(ofMouseEventArgs &e) {
-	if(!bEnable) return;
+	if(bHide) return;
     for (int i=0; i<elements.size(); i++) {
 		elements[i]->mouseMoved(e.x, e.y);
 	}
     
     if(inside(e.x, e.y)) {
+        GuiGroup::inAGroup = true;
+        inGroup = true;
         static GuiEventArgs ge;
         ge.type = GUI_OVER_GROUP;
         ofNotifyEvent(guiEvents, ge, this);
-    }	
+    }
+    else {
+        inGroup = false;
+        GuiGroup::inAGroup = false;
+    }
 }
 
 //--------------------------------------------------------------
 void GuiGroup::mouseDragged(ofMouseEventArgs &e) {
-	if(!bEnable) return;
+	if(bHide) return;
     for (int i=0; i<elements.size(); i++) {
 		elements[i]->mouseDragged(e.x, e.y);
-	}
+        if(elements[i]->bPressed) {
+            static GuiEventArgs ge;
+            ge.type   = GUI_VALUE_CHANGED;
+            ge.object = elements[i];
+            ofNotifyEvent(guiEvents, ge, this);
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void GuiGroup::mousePressed(ofMouseEventArgs &e) {
-	if(!bEnable) return;
+	if(bHide) return;
     for (int i=0; i<elements.size(); i++) {
 		elements[i]->mousePressed(e.x, e.y);
 	}
@@ -331,8 +429,15 @@ void GuiGroup::mousePressed(ofMouseEventArgs &e) {
 
 //--------------------------------------------------------------
 void GuiGroup::mouseReleased(ofMouseEventArgs &e) {
+    if(bHide) return;
+    for (int i=0; i<elements.size(); i++) {
+		elements[i]->mouseReleased(e.x, e.y);
+	}
+    
     bDownInside = false;
     static GuiEventArgs ge;
     ge.type = GUI_RELEASED_GROUP;
     ofNotifyEvent(guiEvents, ge, this);
 }
+
+

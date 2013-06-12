@@ -18,7 +18,8 @@ enum {
 	GUI_BUTTON,
 	GUI_MOVIE_PLAYER,
 	GUI_IMAGE,
-    GUI_LABEL
+    GUI_LABEL,
+    GUI_CHECKBOX
 };
 
 // default...
