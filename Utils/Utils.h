@@ -294,6 +294,38 @@ static string ofCharToString(char c) {
     return s;
 }
 
+static void ofPrintOpenGLCapabilities() {
+  	
+	//printf("Getting OpenGL Capabilities\n");
+	
+	// number of textures
+	GLint ntex;
+	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &ntex);
+	printf("Num Textures: %i\n", ntex);
+	// do we have point sprites
+    
+	if(glewIsSupported("GL_VERSION_1_4  GL_ARB_point_sprite")) {
+		printf("Point Sprites Enabled\n");
+	}
+    
+#ifdef TARGET_WIN32
+	if (WGLEW_ARB_pbuffer) {
+		printf("WGLEW pbuffers Enabled\n");
+	}
+#endif
+    
+	// can we use vbo?
+	if (glewIsSupported("GL_ARB_vertex_buffer_object")) {
+		printf("VBO enabled\n");
+	}
+    
+	// do we use shaders
+	if(glewIsSupported("GL_ARB_vertex_shader")) {
+		printf("Shaders are enabled\n");
+	}
+	//printf("\n\n----- DONE Getting OpenGL Capabilities -----\n");
+}
+
 #pragma mark --- IMAGES ---
 //--------------------------------------------------------------
 // Images
